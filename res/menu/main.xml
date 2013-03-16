@@ -5,13 +5,12 @@
         android:icon="@android:drawable/ic_menu_mylocation"
         android:orderInCategory="1"
         android:showAsAction="ifRoom"
-        android:title="Show Me"/>
+        android:title="Region"/>
     <item
         android:id="@+id/navToClosest"
-        android:icon="@android:drawable/ic_menu_myplaces"
         android:orderInCategory="2"
         android:showAsAction="ifRoom"
-        android:title="Show Me"
-        android:visible="false"/>
+        android:title="Nearest"
+        />
 
 </menu>

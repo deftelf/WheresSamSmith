@@ -3,9 +3,11 @@ package uk.co.deftelf.wheressamsmith;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -20,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     
@@ -60,13 +63,33 @@ public class MainActivity extends Activity {
         map.getMap().setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
             
             public void onInfoWindowClick(Marker arg0) {
-                String url = "http://maps.google.com/maps?daddr=" + arg0.getPosition().latitude + "," + arg0.getPosition().longitude + "&dirflg=r";
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,  Uri.parse(url));
-                startActivity(intent);
+                navTo(arg0.getPosition().latitude, arg0.getPosition().longitude);
+            }
+
+        });
+        
+        map.getMap().setOnMyLocationChangeListener(new OnMyLocationChangeListener() {
+            
+            public void onMyLocationChange(Location arg0) {
+                if (arg0 != null) {
+                    showRegion(arg0);
+                    map.getMap().setOnMyLocationChangeListener(null);                    
+                }
             }
         });
     }
 
+    private void navTo(double lat, double lon) {
+        String url = "http://maps.google.com/maps?daddr=" + lat + "," + lon + "&dirflg=r";
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,  Uri.parse(url));
+        startActivity(intent);
+    }
+
+    private void showRegion(Location location) {
+        LatLng latlng= new LatLng(location.getLatitude(), location.getLongitude());
+        map.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -74,17 +97,22 @@ public class MainActivity extends Activity {
         menu.findItem(R.id.showMe).setOnMenuItemClickListener(new OnMenuItemClickListener() {
             
             public boolean onMenuItemClick(MenuItem item) {
-                Location location = map.getMap().getMyLocation();
-                LatLng latlng= new LatLng(location.getLatitude(), location.getLongitude());
-                map.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
+                showRegion(map.getMap().getMyLocation());
                 return true;
             }
+
         });
         
         menu.findItem(R.id.navToClosest).setOnMenuItemClickListener(new OnMenuItemClickListener() {
             
             public boolean onMenuItemClick(MenuItem item) {
                 
+                Pub.compareFromLat = map.getMap().getMyLocation().getLatitude();
+                Pub.compareFromLon = map.getMap().getMyLocation().getLongitude();
+                Collections.sort(pubs);
+                Pub pub = pubs.get(0);
+                Toast.makeText(MainActivity.this, "Navigating to your nearest Sam Smith's, which is " + pub.name, Toast.LENGTH_LONG).show();
+                navTo(pub.lat, pub.lon);
                 return true;
             }
         });
