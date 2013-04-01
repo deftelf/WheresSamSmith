@@ -5,6 +5,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
@@ -41,11 +44,16 @@ public class MainActivity extends Activity {
         pubs = new ArrayList<Pub>();
         
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("loc.csv")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("data.json")));
+            StringBuilder dataStr = new StringBuilder();
             String line;
             while ((line = br.readLine()) != null) {
+                dataStr.append(line);
+            }
+            JSONArray dataJson = new JSONArray(dataStr.toString());
+            for (int i=0; i < dataJson.length(); i++) {
                 try {
-                    Pub pub = new Pub(line);
+                    Pub pub = new Pub(dataJson.getJSONObject(i));
                     pubs.add(pub);
                 }catch (Exception ex) {
                     Log.d("failed", ex.getMessage() + " str: " + line);
