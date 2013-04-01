@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="uk.co.deftelf.wheressamsmith.AboutActivity" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:padding="10dp"
+                android:text="Where&apos;s Sam Smith?"
+                android:textSize="18sp" />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:text="Deft Elf software"
+                android:textSize="16sp" />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A locator app to find your closest Samuel Smith's pub. Using the data collated by James Gretton. http://www.jamesgretton.co.uk/samuelsmiths/"
+                android:linksClickable="true"
+                android:padding="10dp"
+                android:autoLink="web"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

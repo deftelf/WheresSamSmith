@@ -213,6 +213,16 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+        
+        menu.findItem(R.id.about).setOnMenuItemClickListener(new OnMenuItemClickListener() {
+
+            public boolean onMenuItemClick(MenuItem item) {
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                return true;
+            }
+
+        });
+        
         return true;
     }
 
