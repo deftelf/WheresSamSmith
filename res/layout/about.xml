@@ -38,6 +38,16 @@
                 android:padding="10dp"
                 android:autoLink="web"
                 android:textSize="14sp" />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This application is open source. https://github.com/deftelf/WheresSamSmith"
+                android:linksClickable="true"
+                android:padding="10dp"
+                android:autoLink="web"
+                android:textSize="14sp" />
+            
         </LinearLayout>
     </ScrollView>
 
