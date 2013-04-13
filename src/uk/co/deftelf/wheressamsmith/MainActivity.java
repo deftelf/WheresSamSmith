@@ -45,7 +45,8 @@ public class MainActivity extends Activity {
 
     long lastUpdate;
 
-    private static final long UPDATE_PERIOD = 1000L * 60 * 5; // 5min
+    private static final long UPDATE_PERIOD = 1000L * 60 * 60 * 24 * 7; // 7
+                                                                        // days
 
     private static final String DOWLOADED_DATA_KEY = "data";
 
@@ -100,14 +101,16 @@ public class MainActivity extends Activity {
                                     .putString(DOWLOADED_DATA_KEY, wholeStr.toString())
                                     .putLong(DOWLOADED_TIME_KEY, System.currentTimeMillis()).commit();
                             final ArrayList<Pub> newpubs = parseStoredPubs();
-                            runOnUiThread(new Runnable() {
+                            if (Pub.sanityCheck(newpubs)) {
+                                runOnUiThread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    pubs = newpubs;
-                                    putPubsOnMap();
-                                }
-                            });
+                                    @Override
+                                    public void run() {
+                                        pubs = newpubs;
+                                        putPubsOnMap();
+                                    }
+                                });
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -140,7 +143,7 @@ public class MainActivity extends Activity {
             ArrayList<Pub> pubs = parseFromStream(open);
             return pubs;
         } catch (Exception ex) {
-            Log.d("", ex.getMessage());
+            MainActivity.log(ex.getMessage());
             getSharedPreferences("", MODE_APPEND).edit().putString(DOWLOADED_DATA_KEY, null).commit();
         } finally {
             if (open != null) {
@@ -169,7 +172,7 @@ public class MainActivity extends Activity {
                 Pub pub = new Pub(dataJson.getJSONObject(i));
                 pubs.add(pub);
             } catch (Exception ex) {
-                Log.d("failed", ex.getMessage() + " str: " + line);
+                MainActivity.log(ex.getMessage() + " str: " + line);
             }
         }
         return pubs;
@@ -186,6 +189,10 @@ public class MainActivity extends Activity {
         map.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 10));
     }
 
+    private void searchingToast() {
+        Toast.makeText(MainActivity.this, "Searching for current location", Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -193,7 +200,12 @@ public class MainActivity extends Activity {
         menu.findItem(R.id.showMe).setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
             public boolean onMenuItemClick(MenuItem item) {
-                showRegion(map.getMap().getMyLocation());
+                Location myLocation = map.getMap().getMyLocation();
+                if (myLocation != null) {
+                    showRegion(myLocation);
+                } else {
+                    searchingToast();
+                }
                 return true;
             }
 
@@ -203,17 +215,23 @@ public class MainActivity extends Activity {
 
             public boolean onMenuItemClick(MenuItem item) {
 
-                Pub.compareFromLat = map.getMap().getMyLocation().getLatitude();
-                Pub.compareFromLon = map.getMap().getMyLocation().getLongitude();
-                Collections.sort(pubs);
-                Pub pub = pubs.get(0);
-                Toast.makeText(MainActivity.this, "Navigating to your nearest Sam Smith's, which is " + pub.name,
-                        Toast.LENGTH_LONG).show();
-                navTo(pub.lat, pub.lon);
+                Location myLocation = map.getMap().getMyLocation();
+                if (myLocation != null) {
+                    Pub.compareFromLat = myLocation.getLatitude();
+                    Pub.compareFromLon = myLocation.getLongitude();
+                    Collections.sort(pubs);
+                    Pub pub = pubs.get(0);
+                    Toast.makeText(MainActivity.this, "Navigating to your nearest Sam Smith's, which is " + pub.name,
+                            Toast.LENGTH_LONG).show();
+                    navTo(pub.lat, pub.lon);
+
+                } else {
+                    searchingToast();
+                }
                 return true;
             }
         });
-        
+
         menu.findItem(R.id.about).setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
             public boolean onMenuItemClick(MenuItem item) {
@@ -222,8 +240,12 @@ public class MainActivity extends Activity {
             }
 
         });
-        
+
         return true;
+    }
+    
+    public static void log(String str) {
+        Log.d("WheresSamSmith", str);
     }
 
 }
