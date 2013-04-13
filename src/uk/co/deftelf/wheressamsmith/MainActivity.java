@@ -27,6 +27,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -58,6 +60,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         map = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        if (map.getMap() != null) { // If app doesn't have updated Google Maps then we get a placeholder to upgrade. 
+            init();            
+        }
+    }
+
+    private void init() {
         map.getMap().setMyLocationEnabled(true);
 
         map.getMap().setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
